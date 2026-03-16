@@ -1,1 +1,1 @@
-A simple annoucement system made using Django
+A simple announcement system made using Django
