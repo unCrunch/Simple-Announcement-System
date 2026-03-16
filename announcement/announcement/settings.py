@@ -121,3 +121,8 @@ STATIC_URL = 'static/'
 
 # must configure the project to use our custom user instead of built-in 
 AUTH_USER_MODEL = 'core.User'
+
+# login settings
+LOGIN_REDIRECT_URL = '/announcements/'
+LOGOUT_REDIRECT_URL = '/accounts/login/'
+LOGIN_URL = '/accounts/login/'

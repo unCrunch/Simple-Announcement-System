@@ -1,13 +1,22 @@
 from django.shortcuts import render
+from django.contrib.auth.decorators import login_required, user_passes_test, permission_required
 from .models import Announcement
 from .forms import AnnouncementForm
 
 # Create your views here.
 
+@login_required
 def announcement_list(request):
     announcements = Announcement.objects.all()
     return render(request, 'announcements/list.html', {'announcements' : announcements})
 
+def is_teacher(user):
+    return user.role == 'teacher'
+
+@login_required
+# using manual role added into user model
+# @user_passes_test(is_teacher, login_url='login')
+@permission_required('announcements.add_announcement', raise_exception=True)
 def create_announcement(request):
     if request.method == "GET":
         form = AnnouncementForm()
@@ -15,8 +24,9 @@ def create_announcement(request):
     elif request.method == "POST":
         form = AnnouncementForm(request.POST)
         if form.is_valid():
-            form.save()
-            announcement = form.instance
+            announcement = form.save(commit=False)
+            announcement.created_by = request.user
+            announcement.save()
             form_data = {
                 'form' : AnnouncementForm(),
                 'new_announcement' : announcement,
