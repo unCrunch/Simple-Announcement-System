@@ -18,3 +18,8 @@ def update_profile(request):
             return redirect('edit_profile')
         
     return render(request, 'profiles/edit_profile.html', {'form' : form, 'profile' : profile})
+
+@login_required
+def profile_list(request):
+    profiles = Profile.objects.all()
+    return render(request, 'profiles/profile_list.html', {'profiles' : profiles})
