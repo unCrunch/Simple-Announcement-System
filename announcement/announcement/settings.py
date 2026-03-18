@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     #my apps
     'core',
     'announcements',
+    'profiles',
 ]
 
 MIDDLEWARE = [
@@ -117,7 +118,12 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/6.0/howto/static-files/
 
-STATIC_URL = 'static/'
+STATIC_URL = '/static/'
+STATICFILES_DIRS = [ BASE_DIR / 'static']
+
+# MEDIA files
+MEDIA_URL = '/media/'
+MEDIA_ROOT =  BASE_DIR / 'media' 
 
 # must configure the project to use our custom user instead of built-in 
 AUTH_USER_MODEL = 'core.User'

@@ -1,8 +1,9 @@
 {% extends 'base.html' %}
+{% load static %}
 
 
 {% block header %}
-<!-- This essentially removes the header. by setting it blank. -->
+<!-- This essentially removes the header by setting it blank. -->
 {% endblock %}
 
 
@@ -10,7 +11,13 @@
 
 
 <div class="max-w-2xl mx-auto py-8 px-4 md:px-0">
-  <h2>Login</h2>
+  <div class="sm:mx-auto sm:w-full sm:max-w-sm">
+      <!--  -->
+      <img src="{% static '/logo-lg.png' %}" alt="Your Company" class="mx-auto mt-10 h-69 w-auto" />
+      <h2 class="mt-4 text-center text-2xl/9 font-bold tracking-tight text-gray-900">
+          Login
+      </h2>
+  </div>
   <form method="post">
     {% csrf_token %}
 
@@ -47,7 +54,7 @@
     href="{% url 'register' %}"
     class="block mt-4 text-center text-blue-600 hover:underline"
 >
-    Don't have an account Register here
+    Don't have an account? Register here!
     </a>
 </div>
 
