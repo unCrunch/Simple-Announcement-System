@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     'core',
     'announcements',
     'profiles',
+    'courses',
 ]
 
 MIDDLEWARE = [
