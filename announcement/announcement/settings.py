@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     'announcements',
     'profiles',
     'courses',
+    'web',
 ]
 
 MIDDLEWARE = [
