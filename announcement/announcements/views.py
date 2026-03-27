@@ -1,4 +1,4 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required, user_passes_test, permission_required
 from django.views import View
 from django.utils.decorators import method_decorator
@@ -48,3 +48,21 @@ def create_announcement(request):
         else:
             return render(request, 'announcements/create.html', {'form' : form})
 
+@method_decorator(login_required, name='dispatch')
+@method_decorator(user_passes_test(is_teacher, login_url='login'), name='dispatch')
+class CreateAnnouncementView(View):
+    template_name = 'announcements/create.html'
+    form_class = AnnouncementForm
+    
+    def get(self, request, *args, **kwargs):
+        form = self.form_class()
+        return render(request, self.template_name, {'form' : form})
+    
+    def post(self, request, *args, **kwargs):
+        form = self.form_class(request.POST)
+        if form.is_valid():
+            announcement = form.save(commit=False)
+            announcement.created_by = request.user
+            announcement.save()
+            return redirect('announcement_list')
+        return render(request, self.template_name, {'form' : form})
