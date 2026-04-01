@@ -2,12 +2,18 @@ from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required, user_passes_test, permission_required
 from django.views import View
 from django.utils.decorators import method_decorator
-from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
+from django.views.generic import ListView, FormView
 
 # Create your views here.
 from .models import Announcement
 from .forms import AnnouncementForm
 from core.mixins import IsTeacherRoleMixin
+
+
+def is_teacher(user):
+    return user.role == 'teacher'
+
 
 @login_required
 def announcement_list(request):
@@ -15,15 +21,13 @@ def announcement_list(request):
     return render(request, 'announcements/list.html', {'announcements' : announcements})
 
 
-class AnnouncementListView(LoginRequiredMixin, View):
+class AnnouncementListView(LoginRequiredMixin, ListView):
     template_name = 'announcements/list.html'
-    
-    def get(self, request):
-        announcements = Announcement.objects.all()
-        return render(request, self.template_name, {'announcements' : announcements})
+    model = Announcement
+    context_object_name = 'announcements'
+    ordering = ['-created_at']
 
-def is_teacher(user):
-    return user.role == 'teacher'
+
 
 @login_required
 # using manual role added into user model
@@ -48,19 +52,14 @@ def create_announcement(request):
         else:
             return render(request, 'announcements/create.html', {'form' : form})
 
-class CreateAnnouncementView(LoginRequiredMixin, IsTeacherRoleMixin, View):
+class CreateAnnouncementView(LoginRequiredMixin, PermissionRequiredMixin, FormView):
     template_name = 'announcements/create.html'
     form_class = AnnouncementForm
+    success_url = '/announcements/'
+    permission_required = 'announcements.add_announcement'
     
-    def get(self, request, *args, **kwargs):
-        form = self.form_class()
-        return render(request, self.template_name, {'form' : form})
-    
-    def post(self, request, *args, **kwargs):
-        form = self.form_class(request.POST)
-        if form.is_valid():
-            announcement = form.save(commit=False)
-            announcement.created_by = request.user
-            announcement.save()
-            return redirect('announcement_list')
-        return render(request, self.template_name, {'form' : form})
+    def form_valid(self, form):
+        announcement = form.save(commit=False)
+        announcement.created_by = self.request.user
+        announcement.save()
+        return super().form_valid(form)
