@@ -2,10 +2,12 @@ from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required, user_passes_test, permission_required
 from django.views import View
 from django.utils.decorators import method_decorator
-from .models import Announcement
-from .forms import AnnouncementForm
+from django.contrib.auth.mixins import LoginRequiredMixin
 
 # Create your views here.
+from .models import Announcement
+from .forms import AnnouncementForm
+from core.mixins import IsTeacherRoleMixin
 
 @login_required
 def announcement_list(request):
@@ -13,9 +15,7 @@ def announcement_list(request):
     return render(request, 'announcements/list.html', {'announcements' : announcements})
 
 
-
-@method_decorator(login_required, name='dispatch')
-class AnnouncementListView(View):
+class AnnouncementListView(LoginRequiredMixin, View):
     template_name = 'announcements/list.html'
     
     def get(self, request):
@@ -48,9 +48,7 @@ def create_announcement(request):
         else:
             return render(request, 'announcements/create.html', {'form' : form})
 
-@method_decorator(login_required, name='dispatch')
-@method_decorator(user_passes_test(is_teacher, login_url='login'), name='dispatch')
-class CreateAnnouncementView(View):
+class CreateAnnouncementView(LoginRequiredMixin, IsTeacherRoleMixin, View):
     template_name = 'announcements/create.html'
     form_class = AnnouncementForm
     
